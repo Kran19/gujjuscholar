@@ -1,0 +1,34 @@
+@"
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Flutter
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/build/
+**/coverage/
+
+# Laravel
+**/vendor/
+**/node_modules/
+**/public/build/
+**/public/hot/
+**/storage/*.key
+**/.phpunit.cache/
+
+# IDE
+**/.idea/
+**/.fleet/
+**/.nova/
+**/.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs / temporary files
+*.log
+"@ | Set-Content .gitignore

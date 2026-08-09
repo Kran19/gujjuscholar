@@ -1,0 +1,157 @@
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:edustream/core/constants/app_colors.dart';
+import 'package:edustream/core/constants/app_strings.dart';
+import 'package:edustream/routes/app_routes.dart';
+import 'package:edustream/core/widgets/custom_button.dart';
+import 'package:edustream/core/widgets/custom_textfield.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:edustream/features/auth/presentation/providers/auth_providers.dart';
+
+class SignupEmailScreen extends ConsumerStatefulWidget {
+  const SignupEmailScreen({super.key});
+
+  @override
+  ConsumerState<SignupEmailScreen> createState() => _SignupEmailScreenState();
+}
+
+class _SignupEmailScreenState extends ConsumerState<SignupEmailScreen> {
+  final _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  bool _isLoading = false;
+
+  Future<void> _onSignupPressed() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter email')));
+      return;
+    }
+    
+    // Simple email validation
+    if (!email.contains('@') || !email.contains('.')) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid email')));
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final repo = ref.read(authRepositoryProvider);
+      final response = await repo.sendOtp(email, 'signup');
+      
+      if (!mounted) return;
+      
+      final otp = response['otp'];
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('TEST OTP: $otp'),
+          duration: const Duration(seconds: 10),
+          action: SnackBarAction(label: 'OK', onPressed: () {}),
+        )
+      );
+
+      Navigator.pushNamed(
+        context, 
+        AppRoutes.otpVerification,
+        arguments: {
+          'email': email,
+          'isSignup': true,
+          'purpose': 'signup',
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _onLoginPressed() {
+    Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              
+              // Header
+              const Icon(Icons.person_add_outlined, size: 48, color: AppColors.primary),
+              const SizedBox(height: 24),
+              Text(
+                "Create Account",
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Enter your email to start your journey.",
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              
+              const SizedBox(height: 48),
+
+              // Form
+              CustomTextField(
+                controller: _emailController,
+                hintText: AppStrings.emailHint,
+                prefixIcon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              
+              const SizedBox(height: 32),
+
+              // Button
+              _isLoading 
+                ? const Center(child: CircularProgressIndicator())
+                : CustomButton(
+                    text: "Continue",
+                    onPressed: _onSignupPressed,
+                  ),
+              
+              const SizedBox(height: 24),
+
+              // Login Link
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    text: "Already have an account? ",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    children: [
+                      TextSpan(
+                        text: AppStrings.login,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        recognizer: TapGestureRecognizer()..onTap = _onLoginPressed,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
