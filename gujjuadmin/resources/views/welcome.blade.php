@@ -123,7 +123,7 @@
     <nav class="fixed top-0 w-full z-[100] glass-nav transition-all duration-300 h-20" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
             <a href="/" class="flex items-center gap-2 sm:gap-3 group">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 gradient-brand rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg ring-4 ring-orange-50 group-hover:scale-110 transition-transform">GS</div>
+                <img src="{{ asset('favicon.png') }}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain shadow-md ring-2 ring-orange-50 group-hover:scale-105 transition-transform" alt="GujjuScholar Logo">
                 <span class="text-lg sm:text-2xl font-extrabold tracking-tight">ગુજ્જુ<span class="text-orange-500">સ્કોલર</span></span>
             </a>
             
@@ -131,7 +131,7 @@
                 <a href="#about" class="hover:text-orange-600 transition-colors">About Us</a>
                 <a href="#features" class="hover:text-orange-600 transition-colors">Features</a>
                 <a href="#download" class="hover:text-orange-600 transition-colors">App</a>
-                <a href="/login" class="bg-zinc-900 text-white px-6 py-2.5 rounded-full hover:bg-zinc-800 transition-all shadow-md active:scale-95">Admin Portal</a>
+                <a href="#download" class="bg-orange-500 text-white px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all shadow-md active:scale-95">Download App</a>
             </div>
 
             <!-- Mobile Menu Toggle -->
@@ -150,7 +150,7 @@
                 <!-- Branded Header inside menu -->
                 <div class="flex items-center justify-between mb-16">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 gradient-brand rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-orange-200">GS</div>
+                        <img src="{{ asset('favicon.png') }}" class="w-12 h-12 rounded-2xl object-contain shadow-xl shadow-orange-200" alt="GujjuScholar Logo">
                         <div class="flex flex-col">
                             <span class="text-xl font-black text-zinc-900 leading-none">GUJJU</span>
                             <span class="text-xl font-black text-orange-500 leading-none">SCHOLAR</span>
@@ -177,11 +177,6 @@
                         <span class="text-orange-500">સર્વોત્તમ</span> <br>
                         શિક્ષણ.
                     </h2>
-
-                    <!-- Admin Login -->
-                    <a href="/login" class="menu-item text-2xl font-black text-orange-600 hover:scale-110 transition-transform mb-10 py-2">
-                        Admin Login
-                    </a>
 
                     <!-- Revolutionizing Card -->
                     <div class="menu-item p-8 bg-orange-50 rounded-[2.5rem] border border-orange-100 mb-10 w-full max-w-xs shadow-sm shadow-orange-100/50">
@@ -529,8 +524,8 @@
             <div class="md:col-span-2">
                 <h4 class="font-black text-zinc-900 mb-8 uppercase tracking-[0.2em] text-[10px]">Company</h4>
                 <ul class="space-y-4 text-sm font-bold text-zinc-500">
-                    <li><a href="/login" class="hover:text-orange-500">Admin Login</a></li>
-                    <li><a href="/coming-soon" class="hover:text-orange-500">Coming Soon</a></li>
+                    <li><a href="#about" class="hover:text-orange-500">About Us</a></li>
+                    <li><a href="#features" class="hover:text-orange-500">Features</a></li>
                 </ul>
             </div>
 

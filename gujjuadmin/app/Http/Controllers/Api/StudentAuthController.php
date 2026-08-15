@@ -94,8 +94,8 @@ class StudentAuthController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $email = $request->email;
-            $purpose = $request->purpose;
+            $email = strtolower(trim($request->email));
+            $purpose = trim($request->purpose);
 
             // Check user existence based on purpose
             $studentExists = \App\Models\Student::where('email', $email)->exists();
@@ -108,6 +108,20 @@ class StudentAuthController extends Controller
                 return response()->json(['error' => 'Account not found. Please signup first.'], 400);
             }
 
+            // Cooldown check: prevent re-sending within 30 seconds
+            $existing = \Illuminate\Support\Facades\DB::table('otp_verifications')
+                ->where('email', $email)
+                ->where('purpose', $purpose)
+                ->where('updated_at', '>', now()->subSeconds(30))
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'message' => 'OTP was recently sent. Please check your inbox or wait 30 seconds before requesting again.',
+                    'email' => $email,
+                ], 429);
+            }
+
             // Generate 6-digit OTP
             $otp = (string) rand(100000, 999999);
             
@@ -117,7 +131,7 @@ class StudentAuthController extends Controller
                 [
                     'otp' => $otp,
                     'attempts' => 0,
-                    'expires_at' => now()->addMinutes(5),
+                    'expires_at' => now()->addMinutes(10),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
@@ -127,7 +141,7 @@ class StudentAuthController extends Controller
             $sent = $this->emailService->sendOtpEmail($email, $otp, $purpose);
 
             if (!$sent) {
-                return response()->json(['error' => 'Failed to send OTP email. Please try again later.'], 500);
+                return response()->json(['error' => 'Failed to send OTP email. Please ensure your email is correct and try again.'], 500);
             }
 
             return response()->json([
@@ -152,9 +166,9 @@ class StudentAuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $email = $request->email;
-        $otp = $request->otp;
-        $purpose = $request->purpose;
+        $email = strtolower(trim($request->email));
+        $otp = trim((string) $request->otp);
+        $purpose = trim($request->purpose);
 
         $otpRecord = \Illuminate\Support\Facades\DB::table('otp_verifications')
             ->where('email', $email)
@@ -162,7 +176,7 @@ class StudentAuthController extends Controller
             ->first();
 
         if (!$otpRecord) {
-            return response()->json(['error' => 'Invalid OTP request.'], 400);
+            return response()->json(['error' => 'Invalid OTP request. Please request a new OTP.'], 400);
         }
 
         /** @var object $otpRecord */
@@ -174,11 +188,11 @@ class StudentAuthController extends Controller
             return response()->json(['error' => 'Max OTP attempts reached. Please request a new OTP.'], 400);
         }
 
-        if ($otpRecord->otp !== $otp) {
+        if (trim((string) $otpRecord->otp) !== $otp) {
             \Illuminate\Support\Facades\DB::table('otp_verifications')
                 ->where('id', $otpRecord->id)
                 ->increment('attempts');
-            return response()->json(['error' => 'Invalid OTP'], 400);
+            return response()->json(['error' => 'Invalid OTP. Please check the code sent to your email.'], 400);
         }
 
         // Success - Clear OTP

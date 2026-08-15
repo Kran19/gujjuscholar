@@ -48,14 +48,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       
       if (!mounted) return;
       
-      // Since DLT isn't approved, show the OTP from API response in a Snackbar for now
-      final otp = response['otp'];
+      final message = response['message'] ?? 'OTP sent to your email. Please check your inbox/spam.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('TEST OTP: $otp'),
-          duration: const Duration(seconds: 10),
-          action: SnackBarAction(label: 'OK', onPressed: () {}),
-        )
+          content: Text(message.toString()),
+          backgroundColor: AppColors.primary,
+          duration: const Duration(seconds: 4),
+        ),
       );
 
       Navigator.pushNamed(

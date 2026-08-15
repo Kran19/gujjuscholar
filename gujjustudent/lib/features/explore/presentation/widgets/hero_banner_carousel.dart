@@ -160,39 +160,42 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                               ),
                             ),
                             const Spacer(),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                if (banner.price != null)
-                                  Flexible(
-                                    child: Text(
-                                      '₹${banner.price}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: const Text(
-                                    'Buy Now',
-                                    style: TextStyle(
-                                      color: Color(0xFF00796B), // Teal color from screenshot
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                             Row(
+                               crossAxisAlignment: CrossAxisAlignment.end,
+                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                               children: [
+                                 if (banner.price != null && banner.price!.isNotEmpty) ...[
+                                   Flexible(
+                                     child: Text(
+                                       '₹${banner.price}',
+                                       style: const TextStyle(
+                                         color: Colors.white,
+                                         fontSize: 28,
+                                         fontWeight: FontWeight.w900,
+                                       ),
+                                       overflow: TextOverflow.ellipsis,
+                                     ),
+                                   ),
+                                   const SizedBox(width: 8),
+                                 ] else
+                                   const Spacer(),
+                                 Container(
+                                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                   decoration: BoxDecoration(
+                                     color: Colors.white,
+                                     borderRadius: BorderRadius.circular(16),
+                                   ),
+                                   child: const Text(
+                                     'Explore Now',
+                                     style: TextStyle(
+                                       color: Color(0xFF00796B),
+                                       fontWeight: FontWeight.bold,
+                                       fontSize: 14,
+                                     ),
+                                   ),
+                                 ),
+                               ],
+                             ),
                           ],
                         ),
                       ],

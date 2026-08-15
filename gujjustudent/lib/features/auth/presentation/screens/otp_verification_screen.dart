@@ -76,13 +76,13 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       final repo = ref.read(authRepositoryProvider);
       final response = await repo.sendOtp(widget.email, widget.purpose);
       if (!mounted) return;
-      final newOtp = response['otp'];
+      final message = response['message'] ?? 'A new OTP has been sent to your email.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('NEW TEST OTP: $newOtp'),
-          duration: const Duration(seconds: 10),
-          action: SnackBarAction(label: 'OK', onPressed: () {}),
-        )
+          content: Text(message.toString()),
+          backgroundColor: AppColors.primary,
+          duration: const Duration(seconds: 4),
+        ),
       );
     } catch (e) {
       if (!mounted) return;

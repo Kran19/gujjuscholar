@@ -112,7 +112,7 @@ class StandardListScreen extends ConsumerWidget {
                   final bannerItems = banners.map((b) => BannerItem(
                     title: b.title,
                     subtitle: b.subtitle ?? '',
-                    price: '1299', // Static price as requested
+                    price: null,
                     icon: b.icon,
                     gradientColors: [
                       _parseColor(b.colorStart),
@@ -125,7 +125,7 @@ class StandardListScreen extends ConsumerWidget {
                     bannerItems.add(BannerItem(
                       title: 'Best Value – ${course.name}',
                       subtitle: 'Top rated courses by experts',
-                      price: '1299',
+                      price: null,
                       icon: 'fa-graduation-cap',
                       gradientColors: [const Color(0xFF00695C), const Color(0xFF00897B)],
                       onTap: () {},
