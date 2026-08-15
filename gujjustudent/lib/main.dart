@@ -26,13 +26,13 @@ Future<void> main() async {
 
   runApp(
     const ProviderScope(
-      child: EduStreamApp(),
+      child: GujjuScholarApp(),
     ),
   );
 }
 
-class EduStreamApp extends StatelessWidget {
-  const EduStreamApp({super.key});
+class GujjuScholarApp extends StatelessWidget {
+  const GujjuScholarApp({super.key});
 
   @override
   Widget build(BuildContext context) {

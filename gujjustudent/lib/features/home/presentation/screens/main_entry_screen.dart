@@ -87,7 +87,7 @@ class MainEntryScreen extends ConsumerWidget {
 
   PreferredSizeWidget _buildPersistentAppBar(BuildContext context, WidgetRef ref, int currentIndex) {
     final List<Map<String, String>> headerContent = [
-      {"title": "EduStream", "subtitle": "Learning made easy"},
+      {"title": "GujjuScholar", "subtitle": "Learning made easy"},
       {"title": "My Courses", "subtitle": "Track your progress"},
       {"title": "Explore", "subtitle": "Discover new content"},
       // {"title": "Live Classes", "subtitle": "Join the session"},

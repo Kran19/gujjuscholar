@@ -741,7 +741,7 @@ class ContentApiController extends Controller
                 'razorpay_key' => config('services.razorpay.key_id'),
                 'amount' => $finalAmountPaise, 
                 'currency' => 'INR',
-                'name' => 'EduStream',
+                'name' => 'GujjuScholar',
                 'description' => 'Course Purchase',
             ]);
         } catch (\Exception $e) {

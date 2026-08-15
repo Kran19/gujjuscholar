@@ -30,7 +30,7 @@ class LoginDetectedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Login Detected - EduStream',
+            subject: 'New Login Detected - GujjuScholar',
         );
     }
 
