@@ -1,4 +1,4 @@
-package com.example.edustream
+package com.emperorsmartsolutions.gujjuscholar
 
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity

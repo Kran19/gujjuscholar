@@ -12,11 +12,17 @@ Future<void> main() async {
   // Ensure binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Dotenv (if we had a .env file, we'd load it here)
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('Dotenv loading exception: $e');
+  }
 
-  // Initialize ApiService (reads JWT token from secure storage)
-  await ApiService().init();
+  try {
+    await ApiService().init();
+  } catch (e) {
+    debugPrint('ApiService initialization exception: $e');
+  }
 
   runApp(
     const ProviderScope(
