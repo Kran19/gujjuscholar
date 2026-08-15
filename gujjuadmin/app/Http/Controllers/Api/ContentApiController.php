@@ -469,12 +469,44 @@ class ContentApiController extends Controller
     public function myCourses()
     {
         $student = auth()->guard('api-student')->user();
+        if (!$student) {
+            return response()->json([]);
+        }
+
         $enrollments = Enrollment::where('student_id', $student->id)
             ->active()
             ->with(['course', 'subject'])
             ->get();
             
-        return response()->json($enrollments);
+        // If student has course_id but no explicit enrollment row yet, include it
+        $hasSelectedCourse = $enrollments->contains(function($item) use ($student) {
+            return $item->course_id == $student->course_id;
+        });
+
+        if (!$hasSelectedCourse && $student->course_id) {
+            $course = Course::find($student->course_id);
+            if ($course) {
+                $enrollments->prepend((object)[
+                    'id' => 0,
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'subject_id' => null,
+                    'status' => 'active',
+                    'course' => $course,
+                    'subject' => null,
+                    'is_primary' => true,
+                ]);
+            }
+        }
+
+        $result = $enrollments->map(function($e) use ($student) {
+            $data = is_array($e) ? $e : (is_object($e) && method_exists($e, 'toArray') ? $e->toArray() : (array)$e);
+            $courseId = is_object($e) ? ($e->course_id ?? ($e->course->id ?? null)) : ($data['course_id'] ?? ($data['course']['id'] ?? null));
+            $data['is_active'] = ($courseId == $student->course_id);
+            return $data;
+        });
+            
+        return response()->json($result);
     }
 
     public function quizDetails($id)
@@ -863,6 +895,9 @@ class ContentApiController extends Controller
                         'order_id' => $order->id,
                         'status' => 'active',
                     ]);
+
+                    // Automatically switch active course to newly purchased standard
+                    $student->update(['course_id' => $cartItem->item_id]);
                 } elseif ($cartItem->item_type === Subject::class) {
                     Enrollment::updateOrCreate([
                         'student_id' => $student->id,

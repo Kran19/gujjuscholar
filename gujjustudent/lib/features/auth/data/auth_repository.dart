@@ -104,6 +104,17 @@ class AuthRepository {
     }
   }
 
+  Future<Map<String, dynamic>> switchCourse(int courseId) async {
+    try {
+      final response = await _apiService.post('auth/switch-course', data: {
+        'course_id': courseId,
+      });
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> logout() async {
     await _apiService.setToken('');
   }

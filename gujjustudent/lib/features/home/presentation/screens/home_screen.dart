@@ -6,6 +6,8 @@ import 'package:edustream/core/constants/app_colors.dart';
 import 'package:edustream/features/explore/presentation/providers/explore_providers.dart';
 import 'package:edustream/features/explore/data/models/explore_models.dart';
 import 'package:edustream/features/explore/data/models/explore_subjects.dart';
+import 'package:edustream/features/auth/presentation/providers/auth_providers.dart';
+import 'package:edustream/features/my_courses/presentation/providers/my_courses_providers.dart';
 import 'package:edustream/routes/app_routes.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -45,7 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
-        _buildHeader(),
+        _buildHeader(recommendedCourse),
         _buildBanners(banners),
         SliverToBoxAdapter(
           child: Column(
@@ -373,45 +375,310 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(dynamic recommendedCourse) {
+    final currentCourseName = recommendedCourse != null ? (recommendedCourse['name'] ?? 'Select Standard') : 'Select Standard';
+
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(24, 60, 24, 20),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
       sliver: SliverToBoxAdapter(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Hi Learner 👋",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.darkGrey,
+                        ),
+                      ),
+                      Text(
+                        "GujjuScholar Hub",
+                        style: GoogleFonts.inter(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
+                          color: const Color(0xFF1A1A2E),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            // 1-Tap Active Standard / Course Switcher
+            InkWell(
+              onTap: () => _showStandardSelectionModal(context, recommendedCourse),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
                   children: [
-                    Text(
-                      "Hi Learner 👋",
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.darkGrey,
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.school_rounded, color: AppColors.primary, size: 20),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "ACTIVE STANDARD / COURSE",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.primary,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          Text(
+                            currentCourseName,
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF1A1A2E),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      "GujjuScholar Hub",
-                      style: GoogleFonts.inter(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: const Color(0xFF1A1A2E),
-                        letterSpacing: -0.5,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Switch",
+                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 2),
+                          Icon(Icons.swap_horiz_rounded, color: Colors.white, size: 16),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const Spacer(),
-                const Icon(Icons.notifications_none_rounded, color: AppColors.primary),
-              ],
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _showStandardSelectionModal(BuildContext context, dynamic currentCourse) {
+    final currentId = currentCourse != null ? currentCourse['id'] : null;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Consumer(
+          builder: (context, modalRef, child) {
+            final allCoursesAsync = modalRef.watch(allCoursesProvider);
+
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.75,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Icon(Icons.school_rounded, color: AppColors.primary, size: 24),
+                      const SizedBox(width: 10),
+                      Text(
+                        "Switch Active Standard",
+                        style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Select a standard to instantly update your Home Dashboard, videos & quizzes.",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+                  const Divider(height: 24),
+                  Flexible(
+                    child: allCoursesAsync.when(
+                      data: (courses) {
+                        if (courses.isEmpty) {
+                          return const Center(child: Text("No courses available to switch."));
+                        }
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: courses.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final course = courses[index];
+                            final isSelected = (course.id == currentId);
+
+                            return InkWell(
+                              onTap: () => _handleStandardSwitch(context, course.id, course.name),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? AppColors.primary.withValues(alpha: 0.08) : Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isSelected ? AppColors.primary : Colors.grey[200]!,
+                                    width: isSelected ? 2 : 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: isSelected ? AppColors.primary : Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        Icons.menu_book_rounded,
+                                        color: isSelected ? Colors.white : Colors.grey[700],
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            course.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                              color: isSelected ? AppColors.primary : Colors.black87,
+                                            ),
+                                          ),
+                                          if (course.description != null && course.description!.isNotEmpty)
+                                            Text(
+                                              course.description!,
+                                              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (isSelected)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green[600],
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Text(
+                                          "ACTIVE",
+                                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                        ),
+                                      )
+                                    else
+                                      const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      loading: () => const Center(child: CircularProgressIndicator()),
+                      error: (err, _) => Center(child: Text("Error loading courses: $err")),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _handleStandardSwitch(BuildContext context, int courseId, String courseName) async {
+    try {
+      Navigator.pop(context); // Close bottom sheet
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Switching standard to $courseName..."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+
+      final authRepo = ref.read(authRepositoryProvider);
+      await authRepo.switchCourse(courseId);
+
+      // Invalidate all providers to instantly reload all screens
+      ref.invalidate(homeDataProvider);
+      ref.invalidate(myCoursesProvider);
+      ref.invalidate(categoriesProvider);
+      ref.invalidate(quizHubProvider);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Active standard switched to $courseName!"),
+          backgroundColor: Colors.green[700],
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to switch standard: $e"), backgroundColor: Colors.red),
+      );
+    }
   }
 
   Widget _buildSectionTitle(String title, IconData icon, Color color) {

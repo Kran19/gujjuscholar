@@ -14,6 +14,11 @@ final categoryCoursesProvider = FutureProvider.family<List<CourseModel>, int>((r
   return repo.fetchCategoryCourses(categoryId);
 });
 
+final allCoursesProvider = FutureProvider<List<CourseModel>>((ref) async {
+  final repo = ref.watch(exploreRepositoryProvider);
+  return repo.fetchAllCourses();
+});
+
 final homeDataProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   final repo = ref.watch(exploreRepositoryProvider);
   return repo.fetchHomeData();

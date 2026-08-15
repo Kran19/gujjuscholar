@@ -65,7 +65,6 @@ class _VideoPlayerScreenState extends ConsumerState<VideoPlayerScreen> {
       BetterPlayerDataSourceType.network,
       url,
       videoFormat: videoFormat,
-      useAsMSData: false,
     );
 
     BetterPlayerConfiguration configuration = const BetterPlayerConfiguration(

@@ -239,6 +239,33 @@ class StudentAuthController extends Controller
         return response()->json(['token' => $token]);
     }
 
+    public function switchCourse(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'course_id' => 'required|exists:courses,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $student = auth()->guard('api-student')->user();
+        if (!$student) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $student->update(['course_id' => $request->course_id]);
+        $course = \App\Models\Course::find($request->course_id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Active standard switched successfully to ' . ($course->name ?? 'selected course'),
+            'course_id' => (int)$student->course_id,
+            'course' => $course,
+            'student' => $student->fresh(),
+        ]);
+    }
+
     public function updateProfile(Request $request)
     {
         $student = auth()->guard('api-student')->user();
@@ -247,6 +274,7 @@ class StudentAuthController extends Controller
             'name' => 'sometimes|string|max:255',
             'mobile' => 'sometimes|string|digits:10|unique:students,mobile,' . $student->id . ',id,deleted_at,NULL',
             'bio' => 'nullable|string',
+            'course_id' => 'sometimes|exists:courses,id',
             'password' => 'sometimes|string|min:6|confirmed',
         ]);
 
@@ -255,7 +283,7 @@ class StudentAuthController extends Controller
         }
 
         // Strictly ignore email changes to maintain data consistency
-        $data = $request->only(['name', 'mobile', 'bio']);
+        $data = $request->only(['name', 'mobile', 'bio', 'course_id']);
         if ($request->has('password')) {
             $data['password'] = bcrypt($request->password);
         }
@@ -264,7 +292,7 @@ class StudentAuthController extends Controller
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'student' => $student
+            'student' => $student->fresh()
         ]);
     }
 

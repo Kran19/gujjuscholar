@@ -104,7 +104,8 @@ class ProfileScreen extends ConsumerWidget {
       child: Column(
         children: [
           _buildMenuSection(context, "Account", [
-            _MenuItem(icon: Icons.shopping_bag, title: "My Purchases", color: AppColors.primary),
+            _MenuItem(icon: Icons.school_rounded, title: "My Standard / Course", color: AppColors.primary),
+            _MenuItem(icon: Icons.shopping_bag, title: "My Purchases", color: Colors.indigo),
             _MenuItem(icon: Icons.edit, title: "Edit Profile", color: Colors.orange),
           ]),
           const SizedBox(height: 20),
@@ -138,6 +139,8 @@ class ProfileScreen extends ConsumerWidget {
                           Navigator.pushNamed(context, AppRoutes.editProfile);
                         } else if (item.title == "My Purchases") {
                           Navigator.pushNamed(context, AppRoutes.myPurchases);
+                        } else if (item.title == "My Standard / Course") {
+                          Navigator.pushNamed(context, AppRoutes.explore);
                         }
                       },
                     ))

@@ -27,6 +27,17 @@ class ExploreRepository {
     }
   }
 
+  Future<List<CourseModel>> fetchAllCourses() async {
+    try {
+      final response = await _apiService.get('public/courses');
+      return (response.data as List)
+          .map((json) => CourseModel.fromJson(json))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> fetchHomeData() async {
     try {
       final response = await _apiService.get('content/home');

@@ -53,6 +53,7 @@ Route::group(['middleware' => 'auth:api-student'], function () {
         Route::post('/logout', [StudentAuthController::class, 'logout']);
         Route::post('/refresh', [StudentAuthController::class, 'refresh']);
         Route::post('/switch-mode', [StudentAuthController::class, 'switchMode']);
+        Route::post('/switch-course', [StudentAuthController::class, 'switchCourse']);
     });
 
     Route::group(['prefix' => 'learning'], function () {
