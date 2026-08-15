@@ -50,63 +50,71 @@ class ContentApiController extends Controller
         $personalizedNotes = collect();
         $personalizedQuizzes = collect();
 
-        if ($student && $student->course_id) {
-            $subjectIds = Subject::where('course_id', $student->course_id)->active()->pluck('id');
-            
-            // 1. Fetch videos explicitly checked by admin for this course/subject
-            $personalizedVideos = Video::whereIn('subject_id', $subjectIds)
-                ->active()
-                ->recent()
-                ->orderBy('sort_order', 'asc')
-                ->orderBy('created_at', 'desc')
-                ->get();
+        try {
+            if ($student && $student->course_id) {
+                $subjectIds = Subject::where('course_id', $student->course_id)->active()->pluck('id');
                 
-            // 2. If no course videos were explicitly checked as recent, fetch any globally checked recent videos
-            if ($personalizedVideos->isEmpty()) {
-                $personalizedVideos = Video::active()
-                    ->recent()
-                    ->orderBy('sort_order', 'asc')
-                    ->orderBy('created_at', 'desc')
-                    ->take(10)
-                    ->get();
-            }
+                // 1. Fetch videos explicitly checked by admin for this course/subject (if column exists)
+                if (\Illuminate\Support\Facades\Schema::hasColumn('videos', 'is_recent')) {
+                    $personalizedVideos = Video::whereIn('subject_id', $subjectIds)
+                        ->active()
+                        ->recent()
+                        ->orderBy('sort_order', 'asc')
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+                        
+                    // 2. If no course videos were explicitly checked as recent, fetch any globally checked recent videos
+                    if ($personalizedVideos->isEmpty()) {
+                        $personalizedVideos = Video::active()
+                            ->recent()
+                            ->orderBy('sort_order', 'asc')
+                            ->orderBy('created_at', 'desc')
+                            ->take(10)
+                            ->get();
+                    }
+                }
 
-            // 3. Fallback to latest uploaded videos if none checked
-            if ($personalizedVideos->isEmpty()) {
-                $personalizedVideos = Video::whereIn('subject_id', $subjectIds)
+                // 3. Fallback to latest uploaded videos if none checked
+                if ($personalizedVideos->isEmpty()) {
+                    $personalizedVideos = Video::whereIn('subject_id', $subjectIds)
+                        ->active()
+                        ->orderBy('created_at', 'desc')
+                        ->take(10)
+                        ->get();
+                }
+                    
+                $personalizedNotes = Note::whereIn('subject_id', $subjectIds)
                     ->active()
                     ->orderBy('created_at', 'desc')
                     ->take(10)
                     ->get();
-            }
-                
-            $personalizedNotes = Note::whereIn('subject_id', $subjectIds)
-                ->active()
-                ->orderBy('created_at', 'desc')
-                ->take(10)
-                ->get();
 
-            $personalizedQuizzes = Quiz::whereIn('subject_id', $subjectIds)
-                ->active()
-                ->withCount('questions')
-                ->orderBy('created_at', 'desc')
-                ->take(10)
-                ->get();
-        } else {
-            // For guests or unassigned students, show admin-selected recent videos
-            $personalizedVideos = Video::active()
-                ->recent()
-                ->orderBy('sort_order', 'asc')
-                ->orderBy('created_at', 'desc')
-                ->take(10)
-                ->get();
-
-            if ($personalizedVideos->isEmpty()) {
-                $personalizedVideos = Video::active()
+                $personalizedQuizzes = Quiz::whereIn('subject_id', $subjectIds)
+                    ->active()
+                    ->withCount('questions')
                     ->orderBy('created_at', 'desc')
                     ->take(10)
                     ->get();
+            } else {
+                // For guests or unassigned students, show admin-selected recent videos
+                if (\Illuminate\Support\Facades\Schema::hasColumn('videos', 'is_recent')) {
+                    $personalizedVideos = Video::active()
+                        ->recent()
+                        ->orderBy('sort_order', 'asc')
+                        ->orderBy('created_at', 'desc')
+                        ->take(10)
+                        ->get();
+                }
+
+                if ($personalizedVideos->isEmpty()) {
+                    $personalizedVideos = Video::active()
+                        ->orderBy('created_at', 'desc')
+                        ->take(10)
+                        ->get();
+                }
             }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error loading home personalized content: " . $e->getMessage());
         }
 
         return response()->json([
