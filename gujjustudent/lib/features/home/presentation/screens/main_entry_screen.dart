@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:edustream/core/constants/app_colors.dart';
+import 'package:edustream/core/constants/app_images.dart';
 
 import 'package:edustream/features/home/presentation/screens/home_screen.dart';
 import 'package:edustream/features/my_courses/presentation/screens/my_courses_screen.dart';
@@ -105,12 +106,33 @@ class MainEntryScreen extends ConsumerWidget {
       automaticallyImplyLeading: false,
       title: Row(
         children: [
-          InkWell(
-            onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-              child: const Icon(Icons.person, color: AppColors.primary, size: 20),
+          // GujjuScholar Brand Logo
+          Container(
+            width: 44,
+            height: 44,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                AppImages.logo,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.school_rounded,
+                  color: AppColors.primary,
+                  size: 26,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -121,7 +143,7 @@ class MainEntryScreen extends ConsumerWidget {
               children: [
                 Text(
                   currentHeader["title"]!,
-                  style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 18),
+                  style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 18),
                 ),
                 Text(
                   currentHeader["subtitle"]!,
@@ -139,29 +161,47 @@ class MainEntryScreen extends ConsumerWidget {
             IconButton(
               icon: Icon(
                 currentIndex == 2 ? Icons.shopping_cart_outlined : Icons.notifications_none_rounded,
-                size: 28,
+                size: 26,
                 color: AppColors.black,
               ),
               onPressed: () {
                 if (currentIndex == 2) {
                   Navigator.pushNamed(context, AppRoutes.cart);
+                } else {
+                  // Notification handler or toast
                 }
               },
             ),
-            if (cartCount > 0 && currentIndex == 2)
+            if (currentIndex == 2 && cartCount > 0)
               Positioned(
-                right: 8,
                 top: 8,
+                right: 8,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
-                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                  child: Text('$cartCount', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '$cartCount',
+                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
           ],
         ),
-        const SizedBox(width: 8),
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: InkWell(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
+            borderRadius: BorderRadius.circular(20),
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              child: const Icon(Icons.person, color: AppColors.primary, size: 20),
+            ),
+          ),
+        ),
       ],
     );
   }

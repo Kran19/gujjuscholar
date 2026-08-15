@@ -1,7 +1,7 @@
 <aside class="sidebar" id="sidebar">
     <a href="{{ url('dashboard') }}" class="sidebar-brand">
-        <div class="brand-icon">
-            <i class="fas fa-graduation-cap"></i>
+        <div class="brand-icon" style="background: transparent;">
+            <img src="{{ asset('favicon.png') }}" style="width: 34px; height: 34px; object-fit: contain; border-radius: 8px;" alt="GujjuScholar Logo">
         </div>
         <span class="brand-name">GujjuScholar<sup class="brand-badge">ADMIN</sup></span>
     </a>

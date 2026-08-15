@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:edustream/core/constants/app_colors.dart';
 import 'package:edustream/core/constants/app_strings.dart';
+import 'package:edustream/core/constants/app_images.dart';
 import 'package:edustream/routes/app_routes.dart';
 import 'package:edustream/core/widgets/custom_button.dart';
 import 'package:edustream/core/widgets/custom_textfield.dart';
@@ -18,7 +19,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -26,43 +28,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  bool _isLoading = false;
-
   Future<void> _onLoginPressed() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter email')));
-      return;
-    }
-    
-    // Simple email validation
-    if (!email.contains('@') || !email.contains('.')) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid email')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an email')),
+      );
       return;
     }
 
     setState(() => _isLoading = true);
+
     try {
-      final repo = ref.read(authRepositoryProvider);
-      final response = await repo.sendOtp(email, 'login');
+      final authRepo = ref.read(authRepositoryProvider);
+      
+      // Request fresh OTP
+      await authRepo.sendOtp(email, 'login');
       
       if (!mounted) return;
       
-      final message = response['message'] ?? 'OTP sent to your email. Please check your inbox/spam.';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message.toString()),
-          backgroundColor: AppColors.primary,
-          duration: const Duration(seconds: 4),
-        ),
+        const SnackBar(content: Text('OTP sent to your email successfully!')),
       );
 
+      // Navigate to OTP Screen
       Navigator.pushNamed(
-        context, 
+        context,
         AppRoutes.otpVerification,
         arguments: {
           'email': email,
-          'isSignup': false,
           'purpose': 'login',
         },
       );
@@ -89,8 +83,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             children: [
               const SizedBox(height: 48),
               
-              // Header
-              const Icon(Icons.school_outlined, size: 48, color: AppColors.primary),
+              // GujjuScholar Brand Logo
+              Container(
+                width: 64,
+                height: 64,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    AppImages.logo,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.school_outlined,
+                      size: 40,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
               Text(
                 "Welcome Back!",

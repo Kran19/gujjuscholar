@@ -30,6 +30,21 @@ Route::group(['prefix' => 'public'], function () {
     Route::get('/courses', [ContentApiController::class, 'allCourses']);
 });
 
+// Content & Learning Catalog Routes (Public with optional JWT personalization)
+Route::group(['prefix' => 'content'], function () {
+    Route::get('/home', [ContentApiController::class, 'home']);
+    Route::get('/categories', [ContentApiController::class, 'categories']);
+    Route::get('/categories/{id}/courses', [ContentApiController::class, 'categoryCourses']);
+    Route::get('/courses/{id}/subjects', [ContentApiController::class, 'courseSubjects']);
+    
+    Route::get('/subjects/{id}', [ContentApiController::class, 'subjectDetails']);
+    Route::get('/subjects/{id}/notes', [ContentApiController::class, 'subjectNotes']);
+    Route::get('/subjects/{id}/videos', [ContentApiController::class, 'subjectVideos']);
+    Route::get('/subjects/{id}/papers', [ContentApiController::class, 'subjectPapers']);
+    Route::get('/subjects/{id}/quizzes', [ContentApiController::class, 'subjectQuizzes']);
+    Route::get('/quiz-hub', [ContentApiController::class, 'quizHub']);
+});
+
 // Protected Routes (Student JWT)
 Route::group(['middleware' => 'auth:api-student'], function () {
     
@@ -38,20 +53,6 @@ Route::group(['middleware' => 'auth:api-student'], function () {
         Route::post('/logout', [StudentAuthController::class, 'logout']);
         Route::post('/refresh', [StudentAuthController::class, 'refresh']);
         Route::post('/switch-mode', [StudentAuthController::class, 'switchMode']);
-    });
-
-    Route::group(['prefix' => 'content'], function () {
-        Route::get('/home', [ContentApiController::class, 'home']);
-        Route::get('/categories', [ContentApiController::class, 'categories']);
-        Route::get('/categories/{id}/courses', [ContentApiController::class, 'categoryCourses']);
-        Route::get('/courses/{id}/subjects', [ContentApiController::class, 'courseSubjects']);
-        
-        Route::get('/subjects/{id}', [ContentApiController::class, 'subjectDetails']);
-        Route::get('/subjects/{id}/notes', [ContentApiController::class, 'subjectNotes']);
-        Route::get('/subjects/{id}/videos', [ContentApiController::class, 'subjectVideos']);
-        Route::get('/subjects/{id}/papers', [ContentApiController::class, 'subjectPapers']);
-        Route::get('/subjects/{id}/quizzes', [ContentApiController::class, 'subjectQuizzes']);
-        Route::get('/quiz-hub', [ContentApiController::class, 'quizHub']);
     });
 
     Route::group(['prefix' => 'learning'], function () {

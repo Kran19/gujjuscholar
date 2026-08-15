@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:edustream/core/constants/app_images.dart';
 import 'package:edustream/core/constants/app_colors.dart';
 import 'package:edustream/core/constants/app_strings.dart';
 import 'package:edustream/routes/app_routes.dart';
@@ -73,12 +74,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo Placeholder (Circle for now)
+            // GujjuScholar Logo
             FadeTransition(
               opacity: _fadeAnimation,
               child: Container(
                 width: 120,
                 height: 120,
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -90,10 +92,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     )
                   ],
                 ),
-                child: const Icon(
-                  Icons.school_rounded,
-                  size: 60,
-                  color: AppColors.primary,
+                child: ClipOval(
+                  child: Image.asset(
+                    AppImages.logo,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.school_rounded,
+                      size: 60,
+                      color: AppColors.primary,
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -364,7 +364,7 @@
         <div class="auth-grid"></div>
 
         <div class="auth-brand">
-            <div class="auth-logo"><i class="fas fa-graduation-cap"></i></div>
+            <div class="auth-logo" style="background: transparent; overflow: hidden;"><img src="{{ asset('favicon.png') }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" alt="GujjuScholar Logo"></div>
             <span class="auth-brand-name">GujjuScholar</span>
         </div>
 
