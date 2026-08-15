@@ -92,6 +92,7 @@ Route::delete('/content/videos/file/{id}', [ContentController::class, 'deleteVid
 Route::post('/content/videos/folder/{id}/update', [ContentController::class, 'updateVideoFolder']);
 Route::post('/content/videos/file/{id}/update', [ContentController::class, 'updateVideo']);
 Route::post('/content/videos/file/{id}/toggle-free', [ContentController::class, 'toggleVideoFree']);
+Route::post('/content/videos/file/{id}/toggle-recent', [ContentController::class, 'toggleVideoRecent']);
 Route::post('/content/videos/reorder', [ContentController::class, 'reorderVideos']);
 Route::post('/content/videos/folders/reorder', [ContentController::class, 'reorderVideoFolders']);
 

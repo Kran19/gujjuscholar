@@ -24,6 +24,7 @@ class Video extends Model
         'duration',
         'thumbnail_url',
         'is_free',
+        'is_recent',
         'status',
         'sort_order',
         'hls_path',
@@ -32,6 +33,7 @@ class Video extends Model
 
     protected $casts = [
         'is_free' => 'boolean',
+        'is_recent' => 'boolean',
     ];
 
     // Relationships
@@ -54,6 +56,11 @@ class Video extends Model
     public function scopeFree($query)
     {
         return $query->where('is_free', true);
+    }
+
+    public function scopeRecent($query)
+    {
+        return $query->where('is_recent', true);
     }
 
     protected function videoUrl(): Attribute

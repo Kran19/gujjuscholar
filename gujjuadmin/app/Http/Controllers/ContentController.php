@@ -495,6 +495,16 @@ class ContentController extends Controller
         return response()->json(['success' => true, 'message' => 'Status updated successfully']);
     }
 
+    public function toggleVideoRecent(Request $request, $id)
+    {
+        $video = Video::findOrFail($id);
+        $video->update(['is_recent' => $request->is_recent]);
+        return response()->json([
+            'success' => true, 
+            'message' => $video->is_recent ? 'Video added to Home Recent list' : 'Video removed from Home Recent list'
+        ]);
+    }
+
     public function storeVideo(Request $request, $id)
     {
         $request->validate([
@@ -514,6 +524,7 @@ class ContentController extends Controller
                     'file_path' => $filePath,
                     'video_source' => 'local',
                     'processing_status' => 'pending',
+                    'is_recent' => false,
                     'sort_order' => Video::where('subject_id', $id)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
                 ]);
 
@@ -552,9 +563,10 @@ class ContentController extends Controller
             'description' => 'nullable|string',
             'duration' => 'nullable|string',
             'sort_order' => 'nullable|integer',
+            'is_recent' => 'nullable|boolean',
         ]);
         $video = Video::findOrFail($id);
-        $video->update($request->only(['name', 'description', 'duration', 'sort_order']));
+        $video->update($request->only(['name', 'description', 'duration', 'sort_order', 'is_recent']));
         return response()->json(['success' => true, 'message' => 'Video updated successfully']);
     }
 

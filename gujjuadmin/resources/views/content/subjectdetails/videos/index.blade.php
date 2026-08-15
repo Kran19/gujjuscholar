@@ -5,6 +5,11 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/content-manager.css') }}">
+<style>
+.video-grid {
+    grid-template-columns: 40px 3fr 100px 110px 100px 130px 140px !important;
+}
+</style>
 @endsection
 
 @section('actions')
@@ -64,6 +69,7 @@
             <div>Duration</div>
             <div>Added Date</div>
             <div>Access</div>
+            <div>Home Recent</div>
             <div style="text-align: right;">Actions</div>
         </div>
 
@@ -94,6 +100,7 @@
                 </div>
                 <div style="color: var(--text-muted); font-size: 13px;">—</div>
                 <div style="color: var(--text-muted); font-size: 13px;">{{ $folder->created_at->format('M d, Y') }}</div>
+                <div>—</div>
                 <div>—</div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end;" onclick="event.stopPropagation()">
                     <button class="action-icon-btn" onclick="openRenameModal('{{ $safeFolderName }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
@@ -139,8 +146,17 @@
                         {{ $video->is_free ? 'FREE' : 'PAID' }}
                     </span>
                 </div>
+                <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                    <label class="toggle-switch">
+                        <input type="checkbox" {{ $video->is_recent ? 'checked' : '' }} onchange="toggleRecent('{{ $safeVideoName }}', this.checked, '{{ $video->id }}')">
+                        <span class="slider round"></span>
+                    </label>
+                    <span style="font-size: 11px; margin-left: 8px; color: {{ $video->is_recent ? '#d97706' : 'var(--text-muted)' }}; font-weight: 600;">
+                        {{ $video->is_recent ? '⭐ SHOW' : 'OFF' }}
+                    </span>
+                </div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $safeVideoName }}', '{{ $video->id }}', 'file', '{{ $safeVideoDesc }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $safeVideoName }}', '{{ $video->id }}', 'file', '{{ $safeVideoDesc }}', '{{ $video->duration }}', '{{ $video->sort_order }}', {{ $video->is_recent ? 1 : 0 }})" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
                     @if($video->processing_status === 'completed')
                         <button class="action-icon-btn" onclick="event.stopPropagation(); Swal.fire('HLS Ready', 'This video is streaming via secure HLS.', 'success')" title="HLS Active" style="border-color: var(--primary); color: var(--primary);"><i class="fa-solid fa-circle-check"></i></button>
                     @endif
@@ -206,6 +222,13 @@
             <div style="margin-bottom: 16px;">
                 <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Sort Order</label>
                 <input type="number" class="form-control" id="editSortOrder" value="0">
+            </div>
+            <div style="margin-bottom: 16px; padding: 12px; background: var(--surface-2); border-radius: var(--r-sm); border: 1px solid var(--border);">
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text);">
+                    <input type="checkbox" id="editIsRecent" value="1" style="width: 18px; height: 18px;">
+                    <span><i class="fa-solid fa-star" style="color: #d97706; margin-right: 4px;"></i> Show in Recent Videos on App Home Screen</span>
+                </label>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px; margin-left: 28px;">When enabled, this video appears directly in the student's Home screen Recent Videos carousel.</p>
             </div>
         </div>
         <div class="modal-footer">
@@ -349,6 +372,31 @@ function toggleFree(name, isFree, id) {
     });
 }
 
+function toggleRecent(name, isRecent, id) {
+    fetch('{{ url("/content/videos/file") }}/' + id + '/toggle-recent', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ is_recent: isRecent ? 1 : 0 })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: data.message || `${name} recent status updated`,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => location.reload());
+        }
+    }).catch(err => {
+        Swal.fire('Error', 'Failed to update recent status', 'error');
+    });
+}
+
 function showNewFolderModal() { openModal('newFolderModal'); }
 
 function openDeleteModal(name, id, type) {
@@ -387,11 +435,15 @@ function renameItem() {
     });
 }
 
-function openEditDetailsModal(name, id, type, description, duration, sortOrder) {
+function openEditDetailsModal(name, id, type, description, duration, sortOrder, isRecent) {
     document.getElementById('editTitle').value = name;
     document.getElementById('editDescription').value = description || '';
     document.getElementById('editDuration').value = duration || '';
     document.getElementById('editSortOrder').value = sortOrder || 0;
+    const isRecentCheckbox = document.getElementById('editIsRecent');
+    if (isRecentCheckbox) {
+        isRecentCheckbox.checked = !!isRecent;
+    }
     currentActionItem = id;
     currentActionType = type;
     openModal('editDetailsModal');
@@ -399,6 +451,9 @@ function openEditDetailsModal(name, id, type, description, duration, sortOrder) 
 
 function saveDetails() {
     const url = '{{ url('/content/videos') }}/' + currentActionType + '/' + currentActionItem + '/update';
+    const isRecentCheckbox = document.getElementById('editIsRecent');
+    const isRecent = isRecentCheckbox ? (isRecentCheckbox.checked ? 1 : 0) : 0;
+    
     fetch(url, {
         method: 'POST',
         headers: {
@@ -409,7 +464,8 @@ function saveDetails() {
             name: document.getElementById('editTitle').value,
             description: document.getElementById('editDescription').value,
             duration: document.getElementById('editDuration').value,
-            sort_order: document.getElementById('editSortOrder').value
+            sort_order: document.getElementById('editSortOrder').value,
+            is_recent: isRecent
         })
     }).then(response => response.json())
     .then(data => {
