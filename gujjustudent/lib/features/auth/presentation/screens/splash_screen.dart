@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:edustream/core/constants/app_colors.dart';
 import 'package:edustream/core/constants/app_strings.dart';
 import 'package:edustream/routes/app_routes.dart';
@@ -34,10 +35,28 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    // Auto navigate to login after 3 seconds
-    Timer(const Duration(seconds: 3), () {
+    // Check if user is already logged in
+    _checkAuthAndNavigate();
+  }
+
+  Future<void> _checkAuthAndNavigate() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('jwt_token');
+      if (token != null && token.isNotEmpty) {
+        Navigator.pushReplacementNamed(context, AppRoutes.entry);
+        return;
+      }
+    } catch (e) {
+      debugPrint("Error checking login state: $e");
+    }
+
+    if (mounted) {
       Navigator.pushReplacementNamed(context, AppRoutes.login);
-    });
+    }
   }
 
   @override
