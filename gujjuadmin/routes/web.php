@@ -148,10 +148,12 @@ Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
     Route::post('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.update-password');
 
     // Banner Routes
-    Route::get('/banners', [BannerWebController::class, 'index']);
-    Route::post('/banners', [BannerWebController::class, 'store']);
-    Route::patch('/banners/{banner}/toggle', [BannerWebController::class, 'toggleStatus']);
-    Route::delete('/banners/{banner}', [BannerWebController::class, 'destroy']);
+    Route::get('/banners', [BannerWebController::class, 'index'])->name('banners.index');
+    Route::post('/banners', [BannerWebController::class, 'store'])->name('banners.store');
+    Route::get('/banners/{banner}/edit', [BannerWebController::class, 'edit'])->name('banners.edit');
+    Route::put('/banners/{banner}', [BannerWebController::class, 'update'])->name('banners.update');
+    Route::patch('/banners/{banner}/toggle', [BannerWebController::class, 'toggleStatus'])->name('banners.toggle');
+    Route::delete('/banners/{banner}', [BannerWebController::class, 'destroy'])->name('banners.destroy');
 
     // Account Deletion Requests (Admin)
     Route::get('/admin/deletion-requests', [LegalController::class, 'adminDeletionRequests'])->name('admin.deletion-requests');
