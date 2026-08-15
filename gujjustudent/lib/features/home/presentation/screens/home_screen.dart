@@ -162,7 +162,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildVideoCard(dynamic video) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, AppRoutes.videoPlayer);
+        final videoId = video['id'] is int ? video['id'] : (int.tryParse(video['id']?.toString() ?? '1') ?? 1);
+        final videoName = video['name'] ?? video['title'] ?? 'Video Lesson';
+        Navigator.pushNamed(
+          context,
+          AppRoutes.videoPlayer,
+          arguments: {
+            'videoId': videoId,
+            'videoName': videoName,
+          },
+        );
       },
       borderRadius: BorderRadius.circular(24),
       child: Container(
@@ -385,7 +394,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     Text(
-                      "EduStream Hub",
+                      "GujjuScholar Hub",
                       style: GoogleFonts.inter(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,

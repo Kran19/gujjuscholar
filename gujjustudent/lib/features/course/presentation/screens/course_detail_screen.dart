@@ -138,7 +138,14 @@ class CourseDetailScreen extends StatelessWidget {
                              } else if (lesson.type == 'quiz') {
                                Navigator.pushNamed(context, AppRoutes.quizList);
                              } else {
-                               Navigator.pushNamed(context, AppRoutes.videoPlayer);
+                               Navigator.pushNamed(
+                                 context,
+                                 AppRoutes.videoPlayer,
+                                 arguments: {
+                                   'videoId': int.tryParse(lesson.id) ?? 1,
+                                   'videoName': lesson.title,
+                                 },
+                               );
                              }
                           }
                         },

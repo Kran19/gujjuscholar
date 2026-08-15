@@ -8,7 +8,7 @@ import 'package:edustream/features/auth/presentation/screens/otp_verification_sc
 import 'package:edustream/features/home/presentation/screens/main_entry_screen.dart';
 import 'package:edustream/features/home/presentation/screens/home_screen.dart';
 import 'package:edustream/features/course/presentation/screens/course_detail_screen.dart';
-import 'package:edustream/features/course/presentation/screens/video_player_screen.dart';
+import 'package:edustream/features/subject/presentation/screens/video_player_screen.dart';
 import 'package:edustream/features/course/presentation/screens/notes_screen.dart';
 import 'package:edustream/features/quiz/presentation/screens/quiz_list_screen.dart';
 import 'package:edustream/features/quiz/presentation/screens/quiz_attempt_screen.dart';
@@ -54,7 +54,19 @@ class RouteGenerator {
       case AppRoutes.courseDetail:
         return _buildRoute(const CourseDetailScreen());
       case AppRoutes.videoPlayer:
-        return _buildRoute(const VideoPlayerScreen());
+        final dynamic args = settings.arguments;
+        int videoId = 1;
+        String videoName = 'Video Lesson';
+        if (args is Map) {
+          videoId = args['videoId'] is int ? args['videoId'] : (int.tryParse(args['videoId']?.toString() ?? '1') ?? 1);
+          videoName = args['videoName']?.toString() ?? 'Video Lesson';
+        } else if (args is int) {
+          videoId = args;
+        }
+        return _buildRoute(VideoPlayerScreen(
+          videoId: videoId,
+          videoName: videoName,
+        ));
       case AppRoutes.content: // Used for notes placeholder in my logic
         return _buildRoute(const NotesScreen());
       case AppRoutes.quizList:

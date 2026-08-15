@@ -108,7 +108,7 @@ class _VideoPlayerScreenState extends ConsumerState<VideoPlayerScreen> {
       body: streamAsyncValue.when(
         data: (data) {
           final streamUrl = data['stream_url'];
-          final watermarkText = data['watermark_text'] ?? 'EduStream User';
+          final watermarkText = data['watermark_text'] ?? 'GujjuScholar User';
 
           if (!kIsWeb) {
             _setupPlayer(streamUrl, watermarkText);
