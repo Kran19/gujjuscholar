@@ -17,6 +17,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/downloads/gujjuscholar.apk', function () {
+    $path = public_path('downloads/gujjuscholar.apk');
+    if (file_exists($path)) {
+        return response()->download($path, 'GujjuScholar.apk', [
+            'Content-Type' => 'application/vnd.android.package-archive',
+        ]);
+    }
+    return redirect('/');
+})->name('download.apk');
+
+Route::get('/download/apk', function () {
+    return redirect('/downloads/gujjuscholar.apk');
+});
+
 Route::get('/coming-soon', function () {
     return view('coming-soon');
 });

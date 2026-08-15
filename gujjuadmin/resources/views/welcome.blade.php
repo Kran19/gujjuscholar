@@ -130,8 +130,7 @@
             <div class="hidden md:flex items-center gap-10 text-sm font-semibold text-zinc-600">
                 <a href="#about" class="hover:text-orange-600 transition-colors">About Us</a>
                 <a href="#features" class="hover:text-orange-600 transition-colors">Features</a>
-                <a href="#download" class="hover:text-orange-600 transition-colors">App</a>
-                <a href="#download" class="bg-orange-500 text-white px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all shadow-md active:scale-95">Download App</a>
+                <a href="/downloads/gujjuscholar.apk" download="GujjuScholar.apk" class="apk-download-trigger bg-orange-500 text-white px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all shadow-md active:scale-95">Download App</a>
             </div>
 
             <!-- Mobile Menu Toggle -->
@@ -186,7 +185,7 @@
 
                     <!-- CTA Buttons -->
                     <div class="menu-item flex flex-col gap-4 w-full mt-auto">
-                        <a href="#download" class="gradient-brand px-10 py-5 rounded-[2rem] text-white font-bold text-lg flex items-center justify-center gap-3 shadow-2xl shadow-orange-200 hover:scale-[1.02] active:scale-95 transition-all text-center">
+                        <a href="/downloads/gujjuscholar.apk" download="GujjuScholar.apk" class="apk-download-trigger gradient-brand px-10 py-5 rounded-[2rem] text-white font-bold text-lg flex items-center justify-center gap-3 shadow-2xl shadow-orange-200 hover:scale-[1.02] active:scale-95 transition-all text-center">
                             એપ ડાઉનલોડ કરો
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </a>
@@ -216,7 +215,7 @@
                     ગુજરાતી માધ્યમના વિદ્યાર્થીઓ માટે ખાસ તૈયાર કરાયેલ પ્રીમિયમ લર્નિંગ પ્લેટફોર્મ. તમારા વિષયો પર આત્મવિશ્વાસ અને સ્પષ્ટતા સાથે પકડ મેળવો.
                 </p>
                 <div class="reveal flex flex-col sm:flex-row justify-center lg:justify-start gap-4 px-4 sm:px-0">
-                    <a href="#download" class="gradient-brand px-10 py-5 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-orange-200 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto">
+                    <a href="/downloads/gujjuscholar.apk" download="GujjuScholar.apk" class="apk-download-trigger gradient-brand px-10 py-5 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-orange-200 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto">
                         એપ ડાઉનલોડ કરો
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
@@ -493,6 +492,84 @@
                 </div>
             </div>
         </div>
+    <!-- Dedicated APK Download Section -->
+    <section id="download" class="py-24 bg-gradient-to-b from-white via-orange-50/50 to-orange-100/30 overflow-hidden relative border-t border-zinc-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950 rounded-[3rem] p-10 md:p-16 lg:p-20 text-white shadow-2xl relative overflow-hidden">
+                <!-- Background Glow Effect -->
+                <div class="absolute -top-40 -right-40 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="grid lg:grid-cols-12 gap-12 items-center relative z-10">
+                    <!-- Left: Details & Direct Download -->
+                    <div class="lg:col-span-7">
+                        <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-wider mb-6 border border-orange-500/30">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+                            Direct Android Installation (No Play Store Needed)
+                        </div>
+                        <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-6">
+                            ગુજ્જુસ્કોલર એપ <br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">હમણાં જ ડાઉનલોડ કરો!</span>
+                        </h2>
+                        <p class="text-zinc-300 text-base md:text-lg mb-8 leading-relaxed font-medium">
+                            વિડિયો લેક્ચર્સ, ચેપ્ટર-વાઇઝ ક્વિઝ અને ડિજિટલ મટીરીયલ મેળવવા માટે સીધું તમારા ફોનમાં ઇન્સ્ટોલ કરો.
+                        </p>
+                        
+                        <!-- Badges -->
+                        <div class="flex flex-wrap gap-4 mb-10 text-xs font-bold text-zinc-300">
+                            <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/10">
+                                <span class="text-green-400">●</span> Version 1.0.0 (Latest)
+                            </div>
+                            <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/10">
+                                <i class="fa-solid fa-file-zipper text-orange-400"></i> Size: 71.6 MB
+                            </div>
+                            <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/10">
+                                <i class="fa-brands fa-android text-emerald-400"></i> Android 6.0+
+                            </div>
+                        </div>
+
+                        <!-- Direct Download CTA Button -->
+                        <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+                            <a href="/downloads/gujjuscholar.apk" download="GujjuScholar.apk" id="apk-download-btn" class="apk-download-trigger gradient-brand px-10 py-5 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all text-center">
+                                <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                Download APK Directly
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right: Easy 3-Step Install Guide Card -->
+                    <div class="lg:col-span-5 bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
+                        <h3 class="text-lg font-black text-white mb-6 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center text-sm font-black">?</span>
+                            કેવી રીતે ઇન્સ્ટોલ કરવું? (3 સરળ સ્ટેપ)
+                        </h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-orange-400 shrink-0">1</div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm mb-1">APK ડાઉનલોડ કરો</h4>
+                                    <p class="text-xs text-zinc-400">ઉપરના Download બટન પર ક્લિક કરો.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-orange-400 shrink-0">2</div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm mb-1">Allow Unknown Sources</h4>
+                                    <p class="text-xs text-zinc-400">જો ફોન પૂછે તો "Install from Unknown Sources" પર Allow કરો.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-orange-400 shrink-0">3</div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm mb-1">ઓપન કરો અને ભણવાનું શરૂ કરો!</h4>
+                                    <p class="text-xs text-zinc-400">તમારા મોબાઈલ નંબર સાથે લોગિન કરી અભ્યાસ શરૂ કરો.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Footer -->
@@ -696,7 +773,7 @@
         });
         // ── APK Download with Progress Modal ──
         (function () {
-            const btn = document.getElementById('apk-download-btn');
+            const buttons = document.querySelectorAll('#apk-download-btn, .apk-download-trigger');
             const modal = document.getElementById('apk-download-modal');
             const fill = document.getElementById('apk-progress-fill');
             const pct = document.getElementById('apk-progress-pct');
@@ -704,10 +781,11 @@
             const doneMsg = document.getElementById('apk-modal-done');
             const errMsg = document.getElementById('apk-modal-error');
 
-            if (!btn) return;
+            if (!buttons.length || !modal) return;
 
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
 
                 // Reset modal state
                 fill.style.width = '0%';
