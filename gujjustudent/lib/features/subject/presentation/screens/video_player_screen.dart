@@ -56,10 +56,16 @@ class _VideoPlayerScreenState extends ConsumerState<VideoPlayerScreen> {
   void _setupPlayer(String url, String watermarkText) {
     if (_betterPlayerController != null) return; // Already setup
 
+    BetterPlayerVideoFormat videoFormat = BetterPlayerVideoFormat.other;
+    if (url.contains('.m3u8') || url.contains('/hls/')) {
+      videoFormat = BetterPlayerVideoFormat.hls;
+    }
+
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
       url,
-      videoFormat: BetterPlayerVideoFormat.hls,
+      videoFormat: videoFormat,
+      useAsMSData: false,
     );
 
     BetterPlayerConfiguration configuration = const BetterPlayerConfiguration(

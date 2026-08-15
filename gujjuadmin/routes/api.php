@@ -97,5 +97,10 @@ Route::get('/video/stream/hls/{id}/playlist.m3u8', [VideoStreamController::class
 Route::get('/video/stream/hls/{id}/{segment}', [VideoStreamController::class, 'streamSegment'])
     ->name('video.stream.segment');
 
+// Private Signed Direct MP4 Route
+Route::get('/video/stream/direct/{id}/play.mp4', [VideoStreamController::class, 'streamDirect'])
+    ->name('video.stream.direct')
+    ->middleware('signed');
+
 // Razorpay Webhook
 Route::post('/webhooks/razorpay', [\App\Http\Controllers\Api\RazorpayWebhookController::class, 'handle']);

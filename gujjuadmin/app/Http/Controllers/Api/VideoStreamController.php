@@ -14,53 +14,102 @@ class VideoStreamController extends Controller
     {
         $video = Video::findOrFail($id);
         
-        // Ensure video is processed
-        if ($video->processing_status !== 'completed' || !$video->hls_path) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Video is not ready for streaming.'
-            ], 400);
-        }
-
         $student = auth()->guard('api-student')->user();
         if (!$student) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Please login again.'], 401);
         }
 
         // Check if student has access
         $subject = $video->subject;
-        $isSubjectFree = $subject->is_free ?? false;
-        $isCourseFree = $subject->course->is_free ?? false;
+        $isSubjectFree = $subject ? ($subject->is_free ?? false) : false;
+        $isCourseFree = ($subject && $subject->course) ? ($subject->course->is_free ?? false) : false;
         
-        $isEnrolled = $student->enrollments()
-            ->where(function($q) use ($subject) {
-                $q->where('subject_id', $subject->id)
-                  ->orWhere('course_id', $subject->course_id);
-            })
-            ->where('status', 'active')
-            ->exists();
-
-        if (!$video->is_free && !$isSubjectFree && !$isCourseFree && !$isEnrolled) {
-            return response()->json(['success' => false, 'message' => 'Not enrolled in this subject or course.'], 403);
+        $isEnrolled = false;
+        if ($student && $subject) {
+            $isEnrolled = $student->enrollments()
+                ->where(function($q) use ($subject) {
+                    $q->where('subject_id', $subject->id)
+                      ->orWhere('course_id', $subject->course_id);
+                })
+                ->where('status', 'active')
+                ->exists();
         }
 
-        // Generate a signed URL valid for 2 hours
-        $signedUrl = URL::temporarySignedRoute(
-            'video.stream.hls',
-            now()->addHours(2),
-            ['id' => $video->id]
-        );
+        // Allow playback if video is free, subject is free, course is free, or student is enrolled
+        if (!$video->is_free && !$isSubjectFree && !$isCourseFree && !$isEnrolled) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'This is a premium video. Please enroll in this course or subject to watch.'
+            ], 403);
+        }
 
-        $watermarkText = $student->first_name . ' ' . $student->last_name . ' | ID: ' . $student->id;
+        $streamUrl = null;
+        $rawHlsPath = $video->getRawOriginal('hls_path');
+        $rawFilePath = $video->getRawOriginal('file_path');
+
+        // 1. If HLS processing completed and files exist, serve signed HLS
+        if ($video->processing_status === 'completed' && $rawHlsPath && Storage::disk('private')->exists($rawHlsPath)) {
+            $streamUrl = URL::temporarySignedRoute(
+                'video.stream.hls',
+                now()->addHours(4),
+                ['id' => $video->id]
+            );
+        }
+        // 2. Otherwise fallback to direct local MP4 file streaming
+        elseif ($rawFilePath && (Storage::disk('private')->exists($rawFilePath) || Storage::disk('public')->exists($rawFilePath))) {
+            $streamUrl = URL::temporarySignedRoute(
+                'video.stream.direct',
+                now()->addHours(4),
+                ['id' => $video->id]
+            );
+        }
+        // 3. Fallback to external/direct video URL
+        elseif (!empty($video->video_url)) {
+            $streamUrl = $video->video_url;
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Video stream media is being prepared or file is not found.'
+            ], 404);
+        }
+
+        $watermarkText = ($student->name ?? ($student->first_name . ' ' . $student->last_name)) . ' | ID: ' . $student->id;
 
         return response()->json([
             'success' => true,
             'data' => [
                 'title' => $video->name,
-                'stream_url' => $signedUrl,
+                'stream_url' => $streamUrl,
                 'duration' => $video->duration,
                 'watermark_text' => $watermarkText,
             ]
+        ]);
+    }
+
+    public function streamDirect(Request $request, $id)
+    {
+        if (!$request->hasValidSignature()) {
+            abort(403, 'Invalid or expired stream link.');
+        }
+
+        $video = Video::findOrFail($id);
+        $rawPath = $video->getRawOriginal('file_path');
+        
+        $path = null;
+        if ($rawPath && Storage::disk('private')->exists($rawPath)) {
+            $path = Storage::disk('private')->path($rawPath);
+        } elseif ($rawPath && Storage::disk('public')->exists($rawPath)) {
+            $path = Storage::disk('public')->path($rawPath);
+        }
+
+        if (!$path || !file_exists($path)) {
+            abort(404, 'Video file not found on server storage.');
+        }
+
+        return response()->file($path, [
+            'Content-Type' => 'video/mp4',
+            'Accept-Ranges' => 'bytes',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 
