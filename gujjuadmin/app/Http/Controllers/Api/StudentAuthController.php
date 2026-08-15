@@ -108,34 +108,26 @@ class StudentAuthController extends Controller
                 return response()->json(['error' => 'Account not found. Please signup first.'], 400);
             }
 
-            // Cooldown check: prevent re-sending within 30 seconds
-            $existing = \Illuminate\Support\Facades\DB::table('otp_verifications')
-                ->where('email', $email)
-                ->where('purpose', $purpose)
-                ->where('updated_at', '>', now()->subSeconds(30))
-                ->first();
-
-            if ($existing) {
-                return response()->json([
-                    'message' => 'OTP was recently sent. Please check your inbox or wait 30 seconds before requesting again.',
-                    'email' => $email,
-                ], 429);
-            }
-
-            // Generate 6-digit OTP
+            // Always generate a brand new 6-digit OTP
             $otp = (string) rand(100000, 999999);
             
-            // Store in DB
-            \Illuminate\Support\Facades\DB::table('otp_verifications')->updateOrInsert(
-                ['email' => $email, 'purpose' => $purpose],
-                [
-                    'otp' => $otp,
-                    'attempts' => 0,
-                    'expires_at' => now()->addMinutes(10),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+            // Delete all previous OTP records for this email to avoid stale/duplicate row issues
+            \Illuminate\Support\Facades\DB::table('otp_verifications')
+                ->where('email', $email)
+                ->delete();
+
+            // Insert fresh OTP with 15 minutes validity
+            \Illuminate\Support\Facades\DB::table('otp_verifications')->insert([
+                'email' => $email,
+                'otp' => $otp,
+                'purpose' => $purpose,
+                'attempts' => 0,
+                'expires_at' => now()->addMinutes(15),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            \Illuminate\Support\Facades\Log::info("OTP generated for {$email} ({$purpose}): {$otp}");
 
             // Send OTP via Email
             $sent = $this->emailService->sendOtpEmail($email, $otp, $purpose);
@@ -172,19 +164,21 @@ class StudentAuthController extends Controller
 
         $otpRecord = \Illuminate\Support\Facades\DB::table('otp_verifications')
             ->where('email', $email)
-            ->where('purpose', $purpose)
+            ->orderBy('id', 'desc')
             ->first();
 
         if (!$otpRecord) {
-            return response()->json(['error' => 'Invalid OTP request. Please request a new OTP.'], 400);
+            return response()->json(['error' => 'No OTP found for this email. Please request a new OTP.'], 400);
         }
 
         /** @var object $otpRecord */
         if (now()->greaterThan($otpRecord->expires_at)) {
+            \Illuminate\Support\Facades\DB::table('otp_verifications')->where('id', $otpRecord->id)->delete();
             return response()->json(['error' => 'OTP expired. Please request a new OTP.'], 400);
         }
 
         if ($otpRecord->attempts >= 5) {
+            \Illuminate\Support\Facades\DB::table('otp_verifications')->where('id', $otpRecord->id)->delete();
             return response()->json(['error' => 'Max OTP attempts reached. Please request a new OTP.'], 400);
         }
 
@@ -195,10 +189,10 @@ class StudentAuthController extends Controller
             return response()->json(['error' => 'Invalid OTP. Please check the code sent to your email.'], 400);
         }
 
-        // Success - Clear OTP
-        \Illuminate\Support\Facades\DB::table('otp_verifications')->where('id', $otpRecord->id)->delete();
+        // Success - Clear OTP for this email
+        \Illuminate\Support\Facades\DB::table('otp_verifications')->where('email', $email)->delete();
 
-        if ($purpose === 'signup') {
+        if ($purpose === 'signup' || $otpRecord->purpose === 'signup') {
             return response()->json([
                 'status' => 'needs_signup',
                 'email' => $email
@@ -309,16 +303,19 @@ class StudentAuthController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
+            $email = strtolower(trim($request->email));
+            $otp = trim((string) $request->otp);
+
             $otpRecord = \Illuminate\Support\Facades\DB::table('otp_verifications')
-                ->where('email', $request->email)
-                ->where('purpose', 'reset')
+                ->where('email', $email)
+                ->orderBy('id', 'desc')
                 ->first();
 
-            if (!$otpRecord || $otpRecord->otp !== $request->otp || now()->greaterThan($otpRecord->expires_at)) {
+            if (!$otpRecord || trim((string)$otpRecord->otp) !== $otp || now()->greaterThan($otpRecord->expires_at)) {
                 return response()->json(['error' => 'Invalid or expired OTP.'], 400);
             }
 
-            $student = \App\Models\Student::where('email', $request->email)->first();
+            $student = \App\Models\Student::where('email', $email)->first();
             if (!$student) {
                 return response()->json(['error' => 'Student not found.'], 404);
             }
@@ -327,7 +324,7 @@ class StudentAuthController extends Controller
                 'password' => \Illuminate\Support\Facades\Hash::make($request->password)
             ]);
 
-            \Illuminate\Support\Facades\DB::table('otp_verifications')->where('id', $otpRecord->id)->delete();
+            \Illuminate\Support\Facades\DB::table('otp_verifications')->where('email', $email)->delete();
 
             return response()->json(['message' => 'Password reset successfully']);
         } catch (\Exception $e) {
