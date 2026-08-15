@@ -9,8 +9,7 @@ import 'package:edustream/routes/app_routes.dart';
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js; // ignore: deprecated_member_use
+import 'package:edustream/core/utils/web_payment_bridge.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class CartScreen extends ConsumerStatefulWidget {
@@ -33,8 +32,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
     // Register a global JS function so index.html can call Flutter back after web payment
     if (kIsWeb) {
-      // ignore: undefined_function
-      js.context['handleRazorpaySuccess'] = js.allowInterop(
+      WebPaymentBridge.registerSuccessCallback(
         (String paymentId, String orderId, String signature) {
           _handlePaymentSuccess(PaymentSuccessResponse(
             paymentId,
@@ -52,7 +50,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     _razorpay.clear();
     // Unregister the JS bridge to avoid stale closures
     if (kIsWeb) {
-      js.context['handleRazorpaySuccess'] = null;
+      WebPaymentBridge.unregisterSuccessCallback();
     }
     super.dispose();
   }
@@ -200,14 +198,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       if (kIsWeb) {
         debugPrint('Payment: Detected Web platform, checking for JS function...');
         try {
-          final funcExists = js.context.hasProperty('RazorpayOpen');
-          debugPrint('Payment: RazorpayOpen function exists: $funcExists');
-
-          if (!funcExists) {
-            throw 'JS Error: RazorpayOpen function not found in index.html. Please REFRESH the page (Ctrl+F5).';
-          }
-
-          js.context.callMethod('RazorpayOpen', [js.JsObject.jsify(options)]);
+          WebPaymentBridge.openWebRazorpay(options);
           debugPrint('Payment: JS Interop call successful');
           return;
         } catch (jsError) {
