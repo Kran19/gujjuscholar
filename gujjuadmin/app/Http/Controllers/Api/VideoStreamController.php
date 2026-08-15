@@ -47,8 +47,11 @@ class VideoStreamController extends Controller
         $rawHlsPath = $video->getRawOriginal('hls_path');
         $rawFilePath = $video->getRawOriginal('file_path');
 
+        $resolvedHls = $this->resolveHlsPath($rawHlsPath);
+        $resolvedFile = $this->resolveVideoFilePath($rawFilePath);
+
         // 1. If HLS processing completed and files exist, serve signed HLS
-        if ($video->processing_status === 'completed' && $rawHlsPath && Storage::disk('private')->exists($rawHlsPath)) {
+        if ($resolvedHls) {
             $streamUrl = URL::temporarySignedRoute(
                 'video.stream.hls',
                 now()->addHours(4),
@@ -56,14 +59,14 @@ class VideoStreamController extends Controller
             );
         }
         // 2. Otherwise fallback to direct local MP4 file streaming
-        elseif ($rawFilePath && (Storage::disk('private')->exists($rawFilePath) || Storage::disk('public')->exists($rawFilePath))) {
+        elseif ($resolvedFile) {
             $streamUrl = URL::temporarySignedRoute(
                 'video.stream.direct',
                 now()->addHours(4),
                 ['id' => $video->id]
             );
         }
-        // 3. Fallback to external/direct video URL
+        // 3. Fallback to external/direct video URL or public storage
         elseif (!empty($video->video_url)) {
             $streamUrl = $video->video_url;
         } else {
@@ -95,12 +98,7 @@ class VideoStreamController extends Controller
         $video = Video::findOrFail($id);
         $rawPath = $video->getRawOriginal('file_path');
         
-        $path = null;
-        if ($rawPath && Storage::disk('private')->exists($rawPath)) {
-            $path = Storage::disk('private')->path($rawPath);
-        } elseif ($rawPath && Storage::disk('public')->exists($rawPath)) {
-            $path = Storage::disk('public')->path($rawPath);
-        }
+        $path = $this->resolveVideoFilePath($rawPath);
 
         if (!$path || !file_exists($path)) {
             abort(404, 'Video file not found on server storage.');
@@ -115,7 +113,6 @@ class VideoStreamController extends Controller
 
     public function streamHls(Request $request, $id)
     {
-        // This route should have 'signed' middleware
         if (!$request->hasValidSignature()) {
             abort(403, 'Invalid or expired stream link.');
         }
@@ -123,21 +120,13 @@ class VideoStreamController extends Controller
         $video = Video::findOrFail($id);
         $rawHlsPath = $video->getRawOriginal('hls_path');
         
-        if (!$rawHlsPath || !Storage::disk('private')->exists($rawHlsPath)) {
+        $path = $this->resolveHlsPath($rawHlsPath);
+        if (!$path || !file_exists($path)) {
             abort(404, 'Stream not found.');
         }
 
-        // For large M3U8/TS files, typically you'd stream them or use a dedicated video server.
-        // For standard local Laravel storage, we can return the M3U8 contents.
-        // NOTE: A robust production setup should ideally serve HLS playlists and segments 
-        // via a CDN or a separate media server route that handles .ts segments as well.
-        // For this implementation, we will serve the M3U8 directly if requested.
-        
-        // ... existing comments ...
-        $path = Storage::disk('private')->path($rawHlsPath);
         return response()->file($path, [
             'Content-Type' => 'application/vnd.apple.mpegurl',
-            // Disable caching to prevent storing signed content
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -146,23 +135,78 @@ class VideoStreamController extends Controller
 
     public function streamSegment(Request $request, $id, $segment)
     {
-        // For segments, we check if the video exists and the segment is in its HLS directory
         $video = Video::findOrFail($id);
-        
-        // Construct the path to the segment
         $rawHlsPath = $video->getRawOriginal('hls_path');
-        $directory = dirname($rawHlsPath);
+        $resolvedHls = $this->resolveHlsPath($rawHlsPath);
+
+        $directory = $resolvedHls ? dirname($resolvedHls) : dirname(Storage::disk('private')->path($rawHlsPath));
         $segmentPath = $directory . '/' . $segment;
 
-        if (!Storage::disk('private')->exists($segmentPath)) {
+        if (!file_exists($segmentPath)) {
             abort(404, 'Segment not found.');
         }
 
-        $path = Storage::disk('private')->path($segmentPath);
-        
-        return response()->file($path, [
+        return response()->file($segmentPath, [
             'Content-Type' => 'video/MP2T',
-            'Cache-Control' => 'public, max-age=3600', // Segments can be cached as they are static parts
+            'Cache-Control' => 'public, max-age=3600',
         ]);
+    }
+
+    private function resolveVideoFilePath(?string $rawPath): ?string
+    {
+        if (empty($rawPath)) return null;
+
+        $candidateLocations = [
+            Storage::disk('private')->path($rawPath),
+            Storage::disk('public')->path($rawPath),
+            Storage::disk('local')->path($rawPath),
+            Storage::disk('local')->path('private/' . $rawPath),
+            storage_path('app/private/' . $rawPath),
+            storage_path('app/' . $rawPath),
+            storage_path('app/public/' . $rawPath),
+            '/var/www/edustream/storage/app/private/' . $rawPath,
+            '/var/www/edustream/storage/app/' . $rawPath,
+            '/var/www/edustream/storage/app/public/' . $rawPath,
+            base_path('../storage/app/private/' . $rawPath),
+            base_path('../storage/app/' . $rawPath),
+            base_path('../storage/app/public/' . $rawPath),
+            public_path($rawPath),
+            public_path('storage/' . $rawPath),
+        ];
+
+        foreach ($candidateLocations as $loc) {
+            if (file_exists($loc) && is_file($loc)) {
+                return $loc;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveHlsPath(?string $rawHlsPath): ?string
+    {
+        if (empty($rawHlsPath)) return null;
+
+        $candidateLocations = [
+            Storage::disk('private')->path($rawHlsPath),
+            Storage::disk('public')->path($rawHlsPath),
+            Storage::disk('local')->path($rawHlsPath),
+            Storage::disk('local')->path('private/' . $rawHlsPath),
+            storage_path('app/private/' . $rawHlsPath),
+            storage_path('app/' . $rawHlsPath),
+            storage_path('app/public/' . $rawHlsPath),
+            '/var/www/edustream/storage/app/private/' . $rawHlsPath,
+            '/var/www/edustream/storage/app/' . $rawHlsPath,
+            base_path('../storage/app/private/' . $rawHlsPath),
+            base_path('../storage/app/' . $rawHlsPath),
+        ];
+
+        foreach ($candidateLocations as $loc) {
+            if (file_exists($loc) && is_file($loc)) {
+                return $loc;
+            }
+        }
+
+        return null;
     }
 }
