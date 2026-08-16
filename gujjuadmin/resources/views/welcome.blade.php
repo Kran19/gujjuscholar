@@ -260,20 +260,20 @@
     <section id="about" class="py-12 border-y border-zinc-100 bg-white">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             <div class="text-center group">
-                <div class="text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">10K+</div>
-                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">સક્રિય વિદ્યાર્થીઓ</div>
+                <div class="text-3xl md:text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">ગુજરાતી</div>
+                <div class="text-[10px] md:text-xs font-bold text-zinc-400 uppercase tracking-widest mt-2">તમારી પોતાની ભાષામાં</div>
             </div>
             <div class="text-center group">
-                <div class="text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">500+</div>
-                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">વિડિયો લેક્ચર્સ</div>
+                <div class="text-3xl md:text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">HD</div>
+                <div class="text-[10px] md:text-xs font-bold text-zinc-400 uppercase tracking-widest mt-2">વિડિયો લેક્ચર્સ</div>
             </div>
             <div class="text-center group">
-                <div class="text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">98%</div>
-                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">સફળતા દર</div>
+                <div class="text-3xl md:text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">સ્માર્ટ</div>
+                <div class="text-[10px] md:text-xs font-bold text-zinc-400 uppercase tracking-widest mt-2">પરીક્ષણ અને તૈયારી</div>
             </div>
             <div class="text-center group">
-                <div class="text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">24/7</div>
-                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">નિષ્ણાત સપોર્ટ</div>
+                <div class="text-3xl md:text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">24/7</div>
+                <div class="text-[10px] md:text-xs font-bold text-zinc-400 uppercase tracking-widest mt-2">નિષ્ણાત સપોર્ટ</div>
             </div>
         </div>
     </section>
