@@ -878,6 +878,7 @@
                             fill.style.background = '';
                         }, 3500);
                     });
+                });
             });
         })();
     </script>
