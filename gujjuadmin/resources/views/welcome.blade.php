@@ -683,33 +683,35 @@
         const menuItems = document.querySelectorAll('.menu-item');
         const mobileLinks = document.querySelectorAll('.mobile-link');
 
-        // Create a timeline for the menu
-        const menuTl = gsap.timeline({ paused: true });
+        if (menuToggle && menuClose && menuContainer && menuBackdrop && menuPanel) {
+            // Create a timeline for the menu
+            const menuTl = gsap.timeline({ paused: true });
 
-        menuTl
-            .set(menuContainer, { display: 'block' })
-            .to(menuBackdrop, { opacity: 1, duration: 0.4, ease: "power2.out" })
-            .to(menuPanel, { x: 0, duration: 0.6, ease: "expo.out" }, "-=0.2")
-            .from(menuItems, { 
-                y: 20, 
-                opacity: 0, 
-                duration: 0.4, 
-                stagger: 0.08, 
-                ease: "power2.out" 
-            }, "-=0.3");
+            menuTl
+                .set(menuContainer, { display: 'block' })
+                .to(menuBackdrop, { opacity: 1, duration: 0.4, ease: "power2.out" })
+                .to(menuPanel, { x: 0, duration: 0.6, ease: "expo.out" }, "-=0.2")
+                .from(menuItems, { 
+                    y: 20, 
+                    opacity: 0, 
+                    duration: 0.4, 
+                    stagger: 0.08, 
+                    ease: "power2.out" 
+                }, "-=0.3");
 
-        menuToggle.addEventListener('click', () => menuTl.play());
-        menuClose.addEventListener('click', () => menuTl.reverse());
-        menuBackdrop.addEventListener('click', () => menuTl.reverse());
-        
-        [...menuItems, ...mobileLinks].forEach(link => {
-            link.addEventListener('click', () => {
-                // Only reverse if it's actually a clickable link/button
-                if (link.tagName === 'A' || link.tagName === 'BUTTON') {
-                    menuTl.reverse();
-                }
+            menuToggle.addEventListener('click', () => menuTl.play());
+            menuClose.addEventListener('click', () => menuTl.reverse());
+            menuBackdrop.addEventListener('click', () => menuTl.reverse());
+            
+            [...menuItems, ...mobileLinks].forEach(link => {
+                link.addEventListener('click', () => {
+                    // Only reverse if it's actually a clickable link/button
+                    if (link.tagName === 'A' || link.tagName === 'BUTTON') {
+                        menuTl.reverse();
+                    }
+                });
             });
-        });
+        }
 
         // Orbit Animation
         let orbitRadius = [];
