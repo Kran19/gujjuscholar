@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:edustream/core/constants/app_colors.dart';
 import 'package:edustream/routes/app_routes.dart';
+import 'package:edustream/features/home/presentation/screens/main_entry_screen.dart';
 import 'package:edustream/features/explore/presentation/providers/explore_providers.dart';
 import 'package:edustream/features/explore/data/models/explore_models.dart';
 import 'package:edustream/features/explore/data/models/explore_subjects.dart';
@@ -60,45 +62,64 @@ class StandardListScreen extends ConsumerWidget {
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // 1. Explore Header
+            // 1. Explore Header with Back Button
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    InkWell(
+                      onTap: () {
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        } else {
+                          ref.read(bottomNavIndexProvider.notifier).state = 0;
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.border, width: 1),
+                        ),
+                        child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Explore Courses',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF1A1A2E),
+                            style: GoogleFonts.outfit(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 4),
                           Text(
                             'Boost your learning today',
-                            style: TextStyle(
-                              color: AppColors.darkGrey.withValues(alpha: 0.6),
-                              fontSize: 16,
+                            style: GoogleFonts.inter(
+                              color: AppColors.textMuted,
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(9),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.05),
-                        shape: BoxShape.circle,
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.search, color: AppColors.primary, size: 28),
+                      child: const Icon(Icons.search, color: AppColors.primary, size: 20),
                     ),
                   ],
                 ),

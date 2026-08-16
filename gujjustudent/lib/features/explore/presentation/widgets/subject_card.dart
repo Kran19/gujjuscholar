@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:edustream/core/constants/app_colors.dart';
 import 'package:edustream/features/explore/data/models/explore_subjects.dart';
 
@@ -17,78 +18,75 @@ class SubjectCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.lightGrey.withValues(alpha: 0.5),
+          color: AppColors.border,
           width: 1,
         ),
       ),
       child: InkWell(
         onTap: onViewDetails,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, // Use min size to wrap content
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Icon
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: subject.color.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(subject.icon, color: subject.color, size: 26),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Icon
+                  Container(
+                    padding: const EdgeInsets.all(9),
+                    decoration: BoxDecoration(
+                      color: subject.color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(subject.icon, color: subject.color, size: 22),
+                  ),
+                  const SizedBox(height: 10),
+                  // Title
+                  Text(
+                    subject.name,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  // Description
+                  Text(
+                    subject.description,
+                    style: GoogleFonts.inter(
+                      fontSize: 10.5,
+                      color: AppColors.textMuted,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              // Title
-              Text(
-                subject.name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Color(0xFF1A1A2E),
-                  height: 1.2,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-              // Description
-              Text(
-                subject.description,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.darkGrey.withValues(alpha: 0.7),
-                  height: 1.4,
-                ),
-                maxLines: 3, // Increased lines for better fit
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               // Button
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
+                child: Text(
                   'View Details',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: GoogleFonts.inter(
+                    fontSize: 11.5,
                     color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
